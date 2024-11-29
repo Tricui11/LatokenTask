@@ -1,4 +1,5 @@
-﻿using LatokenTask.Services.Abstract;
+﻿using LatokenTask.Models;
+using LatokenTask.Services.Abstract;
 using Telegram.Bot.Types;
 
 namespace LatokenTask.Services
@@ -7,14 +8,14 @@ namespace LatokenTask.Services
     {
         private readonly ITelegramBotClient _botClient;
         private readonly IPriceService _priceService;
-        private readonly INewsService _newsService;
+        private readonly INewsApiProvider _newsApiProvider;
         private readonly IAnalysisService _analysisService;
 
-        public TelegramBotService(ITelegramBotClient botClient, IPriceService priceService, INewsService newsService, IAnalysisService analysisService)
+        public TelegramBotService(ITelegramBotClient botClient, IPriceService priceService, INewsApiProvider newsApiProvider, IAnalysisService analysisService)
         {
             _botClient = botClient;
             _priceService = priceService;
-            _newsService = newsService;
+            _newsApiProvider = newsApiProvider;
             _analysisService = analysisService;
         }
 
@@ -36,7 +37,7 @@ namespace LatokenTask.Services
                     var prices = await _priceService.GetPriceHistoryAsync(cryptoSymbol, weekAgo, now);
                     var priceChange = _priceService.CalculatePriceChange(prices);
 
-                    var news = await _newsService.GetNewsAsync(cryptoSymbol, weekAgo, now);
+                    var news = await GetNewsAsync(cryptoSymbol, weekAgo, now);
 
                     var analysis = await _analysisService.AnalyzeAsync(cryptoSymbol, priceChange, news);
 
@@ -49,6 +50,27 @@ namespace LatokenTask.Services
         {
             Console.WriteLine($"Error: {exception.Message}");
             return Task.CompletedTask;
+        }
+
+        private async Task<List<NewsArticle>> GetNewsAsync(string keyword, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+
+            List<NewsArticle> allNews = new();
+
+            var searchTasks = new List<NewsApiServiceKeys>((NewsApiServiceKeys[])Enum.GetValues(typeof(NewsApiServiceKeys)))
+    .Select(x => Task.Run(() =>
+            GetApiNewsAsync(allNews, x, keyword, startDate, endDate, cancellationToken),
+        cancellationToken))
+    .ToList();
+            await Task.WhenAll(searchTasks);
+
+            return allNews;
+        }
+
+        private async Task GetApiNewsAsync(List<NewsArticle> allNews, NewsApiServiceKeys serviceKey, string keyword, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+            var news = await   _newsApiProvider.GetNewsAsync(serviceKey, keyword, startDate, endDate, cancellationToken);
+            allNews.AddRange(news);
         }
     }
 }

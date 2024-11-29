@@ -12,7 +12,7 @@ namespace LatokenTask.Services
             _httpClient = httpClient;
         }
 
-        public async Task<List<NewsArticle>> GetNewsAsync(string keyword, DateTime startDate, DateTime endDate)
+        public async Task<List<NewsArticle>> GetNewsAsync(string keyword, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
         {
             //string url = $"https://newsapi.org/v2/everything?q={keyword}&from={startDate:yyyy-MM-dd}&to={endDate:yyyy-MM-dd}&apiKey=YOUR_API_KEY";
             //var response = await _httpClient.GetStringAsync(url);

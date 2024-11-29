@@ -2,6 +2,8 @@
 using LatokenTask.Services.Abstract;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using LatokenTask.ExternalApis;
+using LatokenTask.ExternalApis.NewsapiOrg;
 
 var builder = Host.CreateDefaultBuilder(args);
 
@@ -17,6 +19,22 @@ builder.ConfigureServices((context, services) =>
     services.AddSingleton<IAnalysisService, AnalysisService>();
     services.AddSingleton<ITelegramBotClient>(provider => new TelegramBotClient(telegramBotToken));
     services.AddSingleton<TelegramBotService>();
+
+
+
+
+    services
+    .AddScoped<INewsApiProvider, NewsApiProvider>()
+    .AddNewsapiOrgApiSupport();
+    //.AddShateMApiSupport()
+    //.AddArmtekApiSupport()
+    //.AddMlAutoApiSupport();
+
+
+
+
+
+
 });
 
 var app = builder.Build();

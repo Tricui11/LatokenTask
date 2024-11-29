@@ -39,7 +39,7 @@ namespace LatokenTask.Services
             var firstPrice = prices.First().Value;
             var lastPrice = prices.Last().Value;
 
-            return ((lastPrice - firstPrice) / firstPrice) * 100;
+            return (lastPrice - firstPrice) / firstPrice * 100;
         }
     }
 }
