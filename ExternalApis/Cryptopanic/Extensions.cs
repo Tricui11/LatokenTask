@@ -1,7 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using LatokenTask.ExternalApis.Cryptopanic;
-using LatokenTask.Models;
+﻿using LatokenTask.Models;
 using LatokenTask.Services;
 using LatokenTask.Services.Abstract;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,17 +11,14 @@ public static class Extensions
     {
         var options = services.AddValidateOptions<CryptopanicApiOptions>();
 
-        //services.AddKeyedScoped<INewsService, CryptopanicApiService>(NewsApiServiceKeys.Cryptopanic);
+        services.AddKeyedScoped<INewsService, CryptopanicApiService>(NewsApiServiceKeys.Cryptopanic);
 
-        //services.AddHttpClient(HttpClientNames.Cryptopanic,
-        //    x =>
-        //    {
-        //        var credBytes = Encoding.UTF8.GetBytes($"{options.Login}:{options.Password}");
-        //        var credsBase64 = Convert.ToBase64String(credBytes);
-
-        //        x.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credsBase64);
-        //        x.BaseAddress = new Uri("https://www.goperigon.com/account/api-key");
-        //    });
+        services.AddHttpClient(HttpClientNames.Cryptopanic,
+            x =>
+            {
+             //   x.DefaultRequestHeaders.UserAgent.ParseAdd("LatokenTask.API");
+                x.BaseAddress = new Uri(options.BaseUrl);
+            });
 
         return services;
     }

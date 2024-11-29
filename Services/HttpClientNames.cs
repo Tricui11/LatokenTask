@@ -4,5 +4,6 @@
     {
         public const string NewsapiOrg = nameof(NewsapiOrg);
         public const string GnewsIo = nameof(GnewsIo);
+        public const string Cryptopanic = nameof(Cryptopanic);
     }
 }

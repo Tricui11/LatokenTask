@@ -5,6 +5,6 @@
         //NewsapiOrg,
         NewsapiOrg,
         GnewsIo,
-        //Cryptopanic
+        Cryptopanic
     }
 }

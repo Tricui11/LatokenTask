@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using LatokenTask.ExternalApis;
 using LatokenTask.ExternalApis.NewsapiOrg;
 using LatokenTask.ExternalApis.GnewsIo;
+using LatokenTask.ExternalApis.Cryptopanic;
 
 var builder = Host.CreateDefaultBuilder(args);
 
@@ -27,6 +28,7 @@ builder.ConfigureServices((context, services) =>
     services
     .AddScoped<INewsApiProvider, NewsApiProvider>()
     .AddGnewsIoApiSupport()
+    .AddCryptopanicApiSupport()
     .AddNewsapiOrgApiSupport();
     //.AddArmtekApiSupport()
     //.AddMlAutoApiSupport();

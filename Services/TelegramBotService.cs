@@ -61,7 +61,7 @@ namespace LatokenTask.Services
             var sd = new List<NewsApiServiceKeys>((NewsApiServiceKeys[])Enum.GetValues(typeof(NewsApiServiceKeys)));
 
             var searchTasks = sd
-                .Where(x => x == NewsApiServiceKeys.GnewsIo)
+                .Where(x => x == NewsApiServiceKeys.Cryptopanic)
     .Select(x => Task.Run(() =>
             GetApiNewsAsync(allNews, x, keyword, startDate, endDate, cancellationToken),
         cancellationToken))
