@@ -1,60 +1,27 @@
-﻿//using Microsoft.SemanticKernel;
-//using Microsoft.SemanticKernel.ChatCompletion;
-//using Microsoft.SemanticKernel.Connectors.OpenAI;
+﻿using LatokenTask.Services;
+using LatokenTask.Services.Abstract;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
-//var builder = Kernel.CreateBuilder();
+var builder = Host.CreateDefaultBuilder(args);
 
-//builder.AddOpenAIChatCompletion(
-//      "gpt-4-1106-preview",
-//         Environment.GetEnvironmentVariable("openai-api-key"));
+builder.ConfigureServices((context, services) =>
+{
+    var config = context.Configuration;
+    string openAiApiKey = config["OpenAiApiKey"];
+    string telegramBotToken = config["TelegramBotToken"];
 
-//var kernel = builder.Build();
+    services.AddSemanticKernelServices(openAiApiKey);
+    services.AddHttpClient<IPriceService, PriceService>();
+    services.AddHttpClient<INewsService, NewsService>();
+    services.AddSingleton<IAnalysisService, AnalysisService>();
+    services.AddSingleton<ITelegramBotClient>(provider => new TelegramBotClient(telegramBotToken));
+    services.AddSingleton<TelegramBotService>();
+});
 
-//IChatCompletionService chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+var app = builder.Build();
 
-//ChatHistory chatMessages = new ChatHistory();
-
-//while (true)
-//{
-//    System.Console.Write("User > ");
-
-//    chatMessages.AddUserMessage(Console.ReadLine()!);
-
-//    var result = chatCompletionService.GetStreamingChatMessageContentsAsync(
-//        chatMessages,
-//        executionSettings: new OpenAIPromptExecutionSettings()
-//        {
-//            ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-//            Temperature = 0
-//        },
-//        kernel: kernel);
-
-//    string fullMessage = "";
-
-//    await foreach (var content in result)
-//    {
-//        if (content.Role.HasValue)
-//            System.Console.Write("\nAssistant > ");
-
-//        System.Console.Write(content.Content);
-//        fullMessage += content.Content;
-//    }
-
-//    System.Console.WriteLine();
-//    chatMessages.AddAssistantMessage(fullMessage);
-//}
-using System.Net.Http;
-using LatokenTask.Services;
-
-var botClient = new TelegramBotClient("7518387244:AAE2bNofPh8msUZRuz5zo6y13zN0gYqGR84");
-HttpClient httpClient = new HttpClient();
-var priceService = new PriceService(httpClient); // Реализация IPriceService
-var newsService = new NewsService(httpClient);   // Реализация INewsService
-var analysisService = new AnalysisService(); // Реализация IAnalysisService
-
-var botService = new TelegramBotService(botClient, priceService, newsService, analysisService);
-
+var botService = app.Services.GetRequiredService<TelegramBotService>();
 await botService.StartAsync();
 
-// Задержка приложения
 Console.ReadLine();

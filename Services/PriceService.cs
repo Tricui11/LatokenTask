@@ -1,9 +1,4 @@
 ﻿using LatokenTask.Services.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LatokenTask.Services
 {
@@ -23,7 +18,20 @@ namespace LatokenTask.Services
             //var priceData = JsonConvert.DeserializeObject<CoinGeckoPriceResponse>(response);
 
             //return priceData.Prices.ToDictionary(p => DateTimeOffset.FromUnixTimeMilliseconds((long)p[0]).DateTime, p => p[1]);
-            return null;
+            var priceHistory = new Dictionary<DateTime, decimal>
+            {
+                { startDate, 45000.00m },
+                { startDate.AddDays(1), 46000.50m },
+                { startDate.AddDays(2), 47000.75m },
+                { startDate.AddDays(3), 48000.00m },
+                { startDate.AddDays(4), 49000.25m },
+                { startDate.AddDays(5), 50000.00m },
+                { startDate.AddDays(6), 51000.50m },
+                { endDate, 52000.00m }
+            };
+
+            // Вернём данные
+            return await Task.FromResult(priceHistory);
         }
 
         public decimal CalculatePriceChange(Dictionary<DateTime, decimal> prices)

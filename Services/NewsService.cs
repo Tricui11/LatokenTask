@@ -24,7 +24,28 @@ namespace LatokenTask.Services
             //    Content = a.Content,
             //    PublishedAt = a.PublishedAt
             //}).ToList();
-            return null;
+            // Тестовые данные (например, для Bitcoin)
+            var newsArticles = new List<NewsArticle>
+            {
+                new NewsArticle
+                {
+                    Title = "Bitcoin hits new high",
+                    Content = "Bitcoin reaches a new all-time high, pushing past $50,000.",
+                    Source = "Crypto News Daily",
+                    PublishedDate = startDate.AddDays(2)
+                },
+                new NewsArticle
+                {
+                    Title = "Bitcoin drops after regulatory news",
+                    Content = "Bitcoin experiences a drop in price after news about regulatory changes in the US.",
+                    Source = "Global Crypto News",
+                    PublishedDate = startDate.AddDays(5)
+                }
+            };
+
+            var filteredNews = newsArticles.Where(article => article.PublishedDate >= startDate && article.PublishedDate <= endDate).ToList();
+
+            return await Task.FromResult(filteredNews);
         }
     }
 
