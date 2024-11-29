@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LatokenTask": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "openai-api-key": "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"
+      }
+    }
+  }
+}
