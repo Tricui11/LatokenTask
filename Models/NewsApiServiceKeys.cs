@@ -4,7 +4,7 @@
     {
         //NewsapiOrg,
         NewsapiOrg,
-        //GnewsIo,
+        GnewsIo,
         //Cryptopanic
     }
 }
