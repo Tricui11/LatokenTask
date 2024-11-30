@@ -30,46 +30,44 @@ public class NewsapiOrgApiService : INewsService
     {
         try
         {
-            var response = await _httpClient
-                .GetAsync($"everything?q={keyword}&from=2024-11-28&to=2024-11-28&sortBy=popularity&apiKey={_options.ApiKey}",
-                    cancellationToken);
+            _logger.LogInformation("Start fetching news from newsapi.org for keyword: {Keyword}, from {StartDate} to {EndDate}",
+                keyword, startDate, endDate);
 
+            string formattedStartDate = startDate.ToString("yyyy-MM-dd");
+            string formattedEndDate = endDate.ToString("yyyy-MM-dd");
+
+            var requestUri = $"everything?q={keyword}&from={formattedStartDate}&to={formattedEndDate}&apiKey={_options.ApiKey}";
+
+            var response = await _httpClient.GetAsync(requestUri, cancellationToken);
+            
             if (!response.IsSuccessStatusCode)
             {
+                _logger.LogError("Failed to fetch news from newsapi.org. Status Code: {StatusCode}, Request: {RequestUri}",
+                    response.StatusCode, requestUri);
+                return new List<NewsArticle>();
+            }
+            
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadFromJsonAsync<NewsapiOrgNewsResponseDto>(cancellationToken: cancellationToken);
+
+            if (data?.Articles == null || data.Articles.Count == 0)
+            {
+                _logger.LogWarning("No articles found for the given query: {Keyword}, from {StartDate} to {EndDate}",
+                    keyword, startDate, endDate);
                 return new List<NewsArticle>();
             }
 
-
-
-            response.EnsureSuccessStatusCode();
-           var data = await response.Content.ReadFromJsonAsync<NewsapiOrgNewsResponseDto>(cancellationToken: cancellationToken);
-
-
-
             var news =  _mapper.Map<List<NewsArticle>>(data.Articles);
 
+            _logger.LogInformation("Successfully fetched {ArticleCount} articles from newsapi.org.", news.Count);
 
-
-            //var news = data.Articles.Select(x => new NewsArticle()
-            //{
-            //    Source = "newsapi.org",
-            //    Title = x.Title,
-            //    Content = x.Content,
-            //    PublishedDate = x.PublishedAt
-            //}).ToList();
-            
             return news;
         }
         catch (Exception e)
         {
-          //  _logger.LogError(e, "LAuto: Get details request error. Article - {Article}", article);
+            _logger.LogError(e, "An error occurred while fetching news from newsapi.org.");
             return new List<NewsArticle>();
         }
-
-
-
-
-
-
     }
 }
