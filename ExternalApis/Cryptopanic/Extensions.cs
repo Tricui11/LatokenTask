@@ -16,7 +16,6 @@ public static class Extensions
         services.AddHttpClient(HttpClientNames.Cryptopanic,
             x =>
             {
-             //   x.DefaultRequestHeaders.UserAgent.ParseAdd("LatokenTask.API");
                 x.BaseAddress = new Uri(options.BaseUrl);
             });
 
