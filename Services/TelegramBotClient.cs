@@ -23,7 +23,7 @@ public class TelegramBotClient : Abstract.ITelegramBotClient
     {
         ReceiverOptions receiverOptions = new ReceiverOptions
         {
-            AllowedUpdates = Array.Empty<UpdateType>() // Принимать все типы обновлений
+            AllowedUpdates = Array.Empty<UpdateType>()
         };
 
         _botClient.StartReceiving(
