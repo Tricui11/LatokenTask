@@ -6,6 +6,7 @@ using LatokenTask.ExternalApis;
 using LatokenTask.ExternalApis.NewsapiOrg;
 using LatokenTask.ExternalApis.GnewsIo;
 using LatokenTask.ExternalApis.Cryptopanic;
+using LatokenTask.ExternalApis.Coinmarketcap;
 
 var builder = Host.CreateDefaultBuilder(args);
 
@@ -16,8 +17,6 @@ builder.ConfigureServices((context, services) =>
     string telegramBotToken = config["TelegramBotToken"];
 
     services.AddSemanticKernelServices(openAiApiKey);
-    services.AddHttpClient<IPriceService, PriceService>();
-    services.AddHttpClient<INewsService, NewsService>();
     services.AddSingleton<IAnalysisService, AnalysisService>();
     services.AddSingleton<ITelegramBotClient>(provider => new TelegramBotClient(telegramBotToken));
     services.AddSingleton<TelegramBotService>();
@@ -30,10 +29,10 @@ builder.ConfigureServices((context, services) =>
     .AddGnewsIoApiSupport()
     .AddCryptopanicApiSupport()
     .AddNewsapiOrgApiSupport();
-    //.AddArmtekApiSupport()
-    //.AddMlAutoApiSupport();
 
-
+    services
+    .AddScoped<IPricesApiProvider, PricesApiProvider>()
+    .AddCoinmarketcapApiSupport();
 
 
 

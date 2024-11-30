@@ -7,14 +7,15 @@ namespace LatokenTask.Services
     public class TelegramBotService
     {
         private readonly ITelegramBotClient _botClient;
-        private readonly IPriceService _priceService;
+        private readonly IPricesApiProvider _pricesApiProvider;
         private readonly INewsApiProvider _newsApiProvider;
         private readonly IAnalysisService _analysisService;
 
-        public TelegramBotService(ITelegramBotClient botClient, IPriceService priceService, INewsApiProvider newsApiProvider, IAnalysisService analysisService)
+        public TelegramBotService(ITelegramBotClient botClient, IPricesApiProvider pricesApiProvider,
+            INewsApiProvider newsApiProvider, IAnalysisService analysisService)
         {
             _botClient = botClient;
-            _priceService = priceService;
+            _pricesApiProvider = pricesApiProvider;
             _newsApiProvider = newsApiProvider;
             _analysisService = analysisService;
         }
@@ -28,18 +29,17 @@ namespace LatokenTask.Services
         {
             if (update.Message is { Text: { } text })
             {
-                string cryptoSymbol = text.ToLower();
-                if (!string.IsNullOrEmpty(cryptoSymbol))
+                string cryptoSymbols = text.ToLower();
+                if (!string.IsNullOrEmpty(cryptoSymbols))
                 {
                     DateTime now = DateTime.UtcNow;
                     DateTime weekAgo = now.AddDays(-7);
 
-                    var prices = await _priceService.GetPriceHistoryAsync(cryptoSymbol, weekAgo, now);
-                    var priceChange = _priceService.CalculatePriceChange(prices);
+                    var priceChange7d = await _pricesApiProvider.GetPricesChange7d(PriceApiServiceKeys.Coinmarketcap, cryptoSymbols);
 
-                    var news = await GetNewsAsync(cryptoSymbol, weekAgo, now);
+                    var news = await GetNewsAsync(cryptoSymbols, weekAgo, now);
 
-                    var analysis = await _analysisService.AnalyzeAsync(cryptoSymbol, priceChange, news);
+                    var analysis = await _analysisService.AnalyzeAsync(cryptoSymbols, priceChange7d, news);
 
                     await _botClient.SendTextMessageAsync(update.Message.Chat.Id, analysis);
                 }
@@ -61,7 +61,7 @@ namespace LatokenTask.Services
             var sd = new List<NewsApiServiceKeys>((NewsApiServiceKeys[])Enum.GetValues(typeof(NewsApiServiceKeys)));
 
             var searchTasks = sd
-                .Where(x => x == NewsApiServiceKeys.Cryptopanic)
+                .Where(x => x == NewsApiServiceKeys.NewsapiOrg)
     .Select(x => Task.Run(() =>
             GetApiNewsAsync(allNews, x, keyword, startDate, endDate, cancellationToken),
         cancellationToken))

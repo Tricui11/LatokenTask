@@ -36,6 +36,8 @@ public class NewsapiOrgApiService : INewsService
                 return new List<NewsArticle>();
             }
 
+
+
             response.EnsureSuccessStatusCode();
            var data = await response.Content.ReadFromJsonAsync<NewsapiOrgNewsResponseDto>(cancellationToken: cancellationToken);
 

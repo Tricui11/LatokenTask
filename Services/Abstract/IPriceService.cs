@@ -1,8 +1,9 @@
-﻿namespace LatokenTask.Services.Abstract
+﻿using LatokenTask.Models;
+
+namespace LatokenTask.Services.Abstract
 {
-    public interface IPriceService
+    public interface IPricesService
     {
-        Task<Dictionary<DateTime, decimal>> GetPriceHistoryAsync(string cryptoSymbol, DateTime startDate, DateTime endDate);
-        decimal CalculatePriceChange(Dictionary<DateTime, decimal> prices);
+        Task<List<CryptoPriceInfo>> GetPricesChange7d(string cryptoSymbols, CancellationToken cancellationToken = default);
     }
 }

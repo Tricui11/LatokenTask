@@ -13,18 +13,25 @@ namespace LatokenTask.Services
             _kernelService = kernelService;
         }
 
-        public async Task<string> AnalyzeAsync(string cryptoSymbol, decimal priceChange, List<NewsArticle> newsArticles)
+        public async Task<string> AnalyzeAsync(string cryptoSymbol, List<CryptoPriceInfo> prices, List<NewsArticle> newsArticles)
         {
             var chatMessages = new ChatHistory();
-            chatMessages.AddUserMessage($"Analyze the following news to explain why {cryptoSymbol} changed by {priceChange:F2}%:");
-            
+
+            string priceList = string.Join("\n", prices.Select(p =>
+                $"Название: {p.Name}, Цена: {p.Price:C}, Изменение за 7 дней: {p.PercentChange7d}%"));
+
+            chatMessages.AddUserMessage($"Символ: {cryptoSymbol}\nДоступные варианты:\n{priceList}");
+
             string aggregatedNews = string.Join("\n", newsArticles.Select(n => $"{n.Title}: {n.Content}"));
+            chatMessages.AddUserMessage($"Анализируйте следующие новости, чтобы объяснить, почему изменения {cryptoSymbol}:");
+
             chatMessages.AddUserMessage(aggregatedNews);
-            
+
             var response = await _kernelService.GetResponseFromChatAsync(chatMessages);
-            
+
             return response;
         }
+
     }
 
 }

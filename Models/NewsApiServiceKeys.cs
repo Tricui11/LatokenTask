@@ -2,7 +2,6 @@
 {
     public enum NewsApiServiceKeys
     {
-        //NewsapiOrg,
         NewsapiOrg,
         GnewsIo,
         Cryptopanic
