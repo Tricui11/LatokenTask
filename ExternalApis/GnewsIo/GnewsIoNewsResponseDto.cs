@@ -2,10 +2,10 @@
 {
     public class GnewsIoNewsResponseDto
     {
-        public List<Article> Articles { get; set; }
+        public List<GnewsIoArticleDto> Articles { get; set; }
     }
 
-    public class Article
+    public class GnewsIoArticleDto
     {
         public string Title { get; set; }
         public string Content { get; set; }

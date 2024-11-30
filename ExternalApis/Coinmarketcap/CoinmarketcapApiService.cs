@@ -1,23 +1,23 @@
 ﻿using LatokenTask.ExternalApis.Coinmarketcap;
 using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Net.Http.Json;
-using System.Runtime.Intrinsics.X86;
-using System.Threading;
 
 namespace LatokenTask.Services;
 
 public class CoinmarketcapApiService : IPricesService
 {
     private readonly HttpClient _httpClient;
+    private readonly IMapper _mapper;
     private readonly ILogger<CoinmarketcapApiService> _logger;
 
     public CoinmarketcapApiService(IHttpClientFactory httpClientFactory,
+        IMapper mapper,
         ILogger<CoinmarketcapApiService> logger)
     {
+        _mapper = mapper;
         _logger = logger;
         _httpClient = httpClientFactory.CreateClient(HttpClientNames.Coinmarketcap);
     }
@@ -43,14 +43,7 @@ public class CoinmarketcapApiService : IPricesService
 
             var responseDto = JsonConvert.DeserializeObject<CoinMarketCapResponseDto>(sd);
 
-            var res = responseDto.Data.SelectMany(x => x.Value).Select(c => new CryptoPriceInfo
-            {
-                Name = c.Name,
-                Symbol = c.Symbol,
-                Price = c.Quote.USD.Price,
-                PercentChange7d = c.Quote.USD.PercentChange7d,
-                Source = "Coinmarketcap"
-            }).ToList();
+            var res = _mapper.Map<List<CryptoPriceInfo>>(responseDto.Data.SelectMany(x => x.Value));
 
             return res;
         }

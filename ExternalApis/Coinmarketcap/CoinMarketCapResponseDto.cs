@@ -14,7 +14,7 @@ namespace LatokenTask.ExternalApis.Coinmarketcap
         public USD USD { get; set; }
     }
 
-    public class CryptoData
+    public class CoinmarketcapCryptoData
     {
         public string Name { get; set; }
         public string Symbol { get; set; }
@@ -23,6 +23,6 @@ namespace LatokenTask.ExternalApis.Coinmarketcap
 
     public class CoinMarketCapResponseDto
     {
-        public Dictionary<string, List<CryptoData>> Data { get; set; }
+        public Dictionary<string, List<CoinmarketcapCryptoData>> Data { get; set; }
     }
 }

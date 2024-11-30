@@ -51,7 +51,7 @@ public class CryptopanicApiService : INewsService
                 var title = item.GetProperty("title").GetString();
                 var publishedAt = item.GetProperty("published_at").GetDateTime();
                 var url = item.GetProperty("url").GetString();
-                news.Add(new NewsArticle() { Title = title, PublishedDate = publishedAt, Content = url });
+                news.Add(new NewsArticle() { Title = title, PublishedAt = publishedAt, Content = url });
             }
             
             return news;

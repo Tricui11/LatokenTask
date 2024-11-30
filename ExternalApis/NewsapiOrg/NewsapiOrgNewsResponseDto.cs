@@ -1,6 +1,6 @@
 ﻿namespace LatokenTask.ExternalApis.NewsapiOrg
 { 
-    public class Article
+    public class NewsapiOrgArticleDto
     {
         public string Title { get; set; }
         public DateTime PublishedAt { get; set; }
@@ -9,6 +9,6 @@
 
     public class NewsapiOrgNewsResponseDto
     {
-        public List<Article> Articles { get; set; }
+        public List<NewsapiOrgArticleDto> Articles { get; set; }
     }
 }

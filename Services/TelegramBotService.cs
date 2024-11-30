@@ -35,9 +35,9 @@ namespace LatokenTask.Services
                     DateTime now = DateTime.UtcNow;
                     DateTime weekAgo = now.AddDays(-7);
 
-                    var priceChange7d = await _pricesApiProvider.GetPricesChange7d(PriceApiServiceKeys.Coingecko, cryptoSymbols);
+                 //   var priceChange7d = await _pricesApiProvider.GetPricesChange7d(PriceApiServiceKeys.Coingecko, cryptoSymbols);
 
-                    //var news = await GetNewsAsync(cryptoSymbols, weekAgo, now);
+                    var news = await GetNewsAsync(cryptoSymbols, weekAgo, now);
 
                     //var analysis = await _analysisService.AnalyzeAsync(cryptoSymbols, priceChange7d, news);
 

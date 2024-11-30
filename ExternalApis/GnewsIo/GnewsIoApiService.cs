@@ -1,6 +1,7 @@
 ﻿using LatokenTask.ExternalApis.GnewsIo;
 using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
+using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.Http.Json;
@@ -11,14 +12,17 @@ public class GnewsIoApiService : INewsService
 {
     private readonly HttpClient _httpClient;
     private readonly GnewsIoApiOptions _options;
+    private readonly IMapper _mapper;
     private readonly ILogger<GnewsIoApiService> _logger;
 
     public GnewsIoApiService(IHttpClientFactory httpClientFactory,
         GnewsIoApiOptions options,
+        IMapper mapper,
         ILogger<GnewsIoApiService> logger)
     {
         _logger = logger;
         _options = options;
+        _mapper = mapper;
         _httpClient = httpClientFactory.CreateClient(HttpClientNames.GnewsIo);
     }
 
@@ -41,14 +45,10 @@ public class GnewsIoApiService : INewsService
             response.EnsureSuccessStatusCode();
            var data = await response.Content.ReadFromJsonAsync<GnewsIoNewsResponseDto>(cancellationToken: cancellationToken);
 
-            var news = data.Articles.Select(x => new NewsArticle()
-            {
-                Source = "newsapi.org",
-                Title = x.Title,
-                Content = x.Content,
-                PublishedDate = x.PublishedAt
-            }).ToList();
-            
+
+            var news = _mapper.Map<List<NewsArticle>>(data.Articles);
+
+
             return news;
         }
         catch (Exception e)

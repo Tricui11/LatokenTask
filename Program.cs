@@ -2,12 +2,13 @@
 using LatokenTask.Services.Abstract;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using LatokenTask.ExternalApis;
 using LatokenTask.ExternalApis.NewsapiOrg;
 using LatokenTask.ExternalApis.GnewsIo;
 using LatokenTask.ExternalApis.Cryptopanic;
 using LatokenTask.ExternalApis.Coinmarketcap;
 using LatokenTask.ExternalApis.Coingecko;
+using Microsoft.Extensions.Configuration;
+using LatokenTask.Mapping;
 
 var builder = Host.CreateDefaultBuilder(args);
 
@@ -37,7 +38,8 @@ builder.ConfigureServices((context, services) =>
     .AddCoinmarketcapApiSupport();
 
 
-
+    services
+    .AddCustomMapster();
 
 });
 

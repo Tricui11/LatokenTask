@@ -1,8 +1,8 @@
 ﻿using LatokenTask.ExternalApis.NewsapiOrg;
 using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
+using MapsterMapper;
 using Microsoft.Extensions.Logging;
-using System.Net;
 using System.Net.Http.Json;
 
 namespace LatokenTask.Services;
@@ -12,13 +12,16 @@ public class NewsapiOrgApiService : INewsService
     private readonly HttpClient _httpClient;
     private readonly NewsapiOrgApiOptions _options;
     private readonly ILogger<NewsapiOrgApiService> _logger;
+    private readonly IMapper _mapper;
 
     public NewsapiOrgApiService(IHttpClientFactory httpClientFactory,
         NewsapiOrgApiOptions options,
+        IMapper mapper,
         ILogger<NewsapiOrgApiService> logger)
     {
         _logger = logger;
         _options = options;
+        _mapper = mapper;
         _httpClient = httpClientFactory.CreateClient(HttpClientNames.NewsapiOrg);
     }
 
@@ -41,13 +44,19 @@ public class NewsapiOrgApiService : INewsService
             response.EnsureSuccessStatusCode();
            var data = await response.Content.ReadFromJsonAsync<NewsapiOrgNewsResponseDto>(cancellationToken: cancellationToken);
 
-            var news = data.Articles.Select(x => new NewsArticle()
-            {
-                Source = "newsapi.org",
-                Title = x.Title,
-                Content = x.Content,
-                PublishedDate = x.PublishedAt
-            }).ToList();
+
+
+            var news =  _mapper.Map<List<NewsArticle>>(data.Articles);
+
+
+
+            //var news = data.Articles.Select(x => new NewsArticle()
+            //{
+            //    Source = "newsapi.org",
+            //    Title = x.Title,
+            //    Content = x.Content,
+            //    PublishedDate = x.PublishedAt
+            //}).ToList();
             
             return news;
         }
