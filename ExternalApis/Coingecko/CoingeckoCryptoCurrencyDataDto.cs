@@ -4,9 +4,7 @@ namespace LatokenTask.ExternalApis.Coingecko
 {
     public class CoingeckoCryptoCurrencyDataDto
     {
-
         public string Symbol { get; set; }
-
         public string Name { get; set; }
 
         [JsonProperty("market_data")]
@@ -21,7 +19,6 @@ namespace LatokenTask.ExternalApis.Coingecko
 
     public class CurrentPriceUSD
     {
-        [JsonProperty("usd")]
         public decimal USD { get; set; }
     }
 }

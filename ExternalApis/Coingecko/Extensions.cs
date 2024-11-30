@@ -1,7 +1,6 @@
 ﻿using LatokenTask.Models;
 using LatokenTask.Services;
 using LatokenTask.Services.Abstract;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LatokenTask.ExternalApis.Coingecko;
@@ -17,11 +16,6 @@ public static class Extensions
         services.AddHttpClient(HttpClientNames.Coingecko,
             x =>
             {
-                //   x.DefaultRequestHeaders.UserAgent.ParseAdd("LatokenTask.API");
-
-
-
-
                 x.BaseAddress = new Uri(options.BaseUrl);
             });
 

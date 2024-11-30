@@ -26,7 +26,7 @@ public class CoinmarketcapApiService : IPricesService
     {
         try
         {
-            _logger.LogInformation("Start fetching prices from coinmarketcap for keyword: {Keyword}, from {StartDate} to {EndDate}",
+            _logger.LogInformation("Start fetching prices from coinmarketcap for keyword: {cryptoSymbols}",
                 cryptoSymbols);
 
             var requestUri = $"cryptocurrency/quotes/latest?symbol={cryptoSymbols}";

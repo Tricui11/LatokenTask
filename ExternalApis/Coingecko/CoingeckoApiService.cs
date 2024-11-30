@@ -2,9 +2,8 @@
 using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System;
 using System.Globalization;
+using System.Net.Http.Json;
 
 namespace LatokenTask.Services;
 
@@ -12,18 +11,23 @@ public class CoingeckoApiService : IPricesService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<CoingeckoApiService> _logger;
+    private List<CoingeckoCryptoCurrencyInfoDto> _cachedCoinsList;
+    private readonly object _cacheLock = new();
 
-    public CoingeckoApiService(IHttpClientFactory httpClientFactory,
-        ILogger<CoingeckoApiService> logger)
+    public CoingeckoApiService(IHttpClientFactory httpClientFactory, ILogger<CoingeckoApiService> logger)
     {
         _logger = logger;
         _httpClient = httpClientFactory.CreateClient(HttpClientNames.Coingecko);
+        _cachedCoinsList = null;
     }
 
     public async Task<List<CryptoPriceInfo>> GetPricesChange7d(string cryptoSymbols, CancellationToken cancellationToken = default)
     {
         try
         {
+            _logger.LogInformation("Start fetching prices from coingecko for keyword: {Keyword}, from {StartDate} to {EndDate}",
+                cryptoSymbols);
+
             var coins = await GetCoinsList(cancellationToken);
 
             string[] cryptoSubstrings = cryptoSymbols.Split(',').Select(s => s.Trim()).ToArray();
@@ -74,38 +78,60 @@ public class CoingeckoApiService : IPricesService
                 });
             }
 
+            _logger.LogInformation("Successfully fetched {PricesCount} prices from coingecko.", res.Count);
+
             return res;
         }
         catch (Exception e)
         {
-            //  _logger.LogError(e, "LAuto: Get details request error. Article - {Article}", article);
+            _logger.LogError(e, "An error occurred while getting price from coingecko.");
             return default;
         }
     }
 
     private async Task<List<CoingeckoCryptoCurrencyInfoDto>> GetCoinsList(CancellationToken cancellationToken = default)
     {
+        if (_cachedCoinsList != null)
+        {
+            _logger.LogInformation("Using cached coins list.");
+            return _cachedCoinsList;
+        }
+
+        return await GetCoinsListFromApi(cancellationToken);
+    }
+
+    private async Task<List<CoingeckoCryptoCurrencyInfoDto>> GetCoinsListFromApi(CancellationToken cancellationToken)
+    {
         try
         {
-            var response = await _httpClient.GetAsync("coins/list", cancellationToken);
+            _logger.LogInformation("Fetching coins list from Coingecko.");
 
-            var sd = await response.Content.ReadAsStringAsync();
+            var response = await _httpClient.GetAsync("coins/list", cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
-                return default;
+                _logger.LogError("Failed to get coins list from Coingecko. Status Code: {StatusCode}, Request: {RequestUri}",
+                    response.StatusCode);
+                return new List<CoingeckoCryptoCurrencyInfoDto>();
             }
 
             response.EnsureSuccessStatusCode();
 
+            var data = await response.Content.ReadFromJsonAsync<List<CoingeckoCryptoCurrencyInfoDto>>(cancellationToken: cancellationToken);
 
-            var dtos = JsonConvert.DeserializeObject<List<CoingeckoCryptoCurrencyInfoDto>>(sd);
-            return dtos;
+            lock (_cacheLock)
+            {
+                _cachedCoinsList = data ?? new List<CoingeckoCryptoCurrencyInfoDto>();  // Кэшируем ответ
+            }
+
+            _logger.LogInformation("Successfully fetched and cached coins list from Coingecko.");
+
+            return _cachedCoinsList;
         }
         catch (Exception e)
         {
-            //  _logger.LogError(e, "LAuto: Get details request error. Article - {Article}", article);
-            return default;
+            _logger.LogError(e, "An error occurred while fetching coins list from Coingecko.");
+            return new List<CoingeckoCryptoCurrencyInfoDto>();
         }
     }
 
@@ -114,29 +140,34 @@ public class CoingeckoApiService : IPricesService
     {
         try
         {
-        //    cryptoId = "bitcoin-2015-wrapper-meme";
+            _logger.LogInformation("Start getting price from coingecko for keyword: {Keyword}, to {date}",
+                cryptoId, date);
+
             string formattedDate = date.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
 
-            var response = await _httpClient
-                .GetAsync($"https://api.coingecko.com/api/v3/coins/{cryptoId}/history?date={formattedDate}&localization=false",
-                    cancellationToken);
+            var requestUri = $"{cryptoId}/history?date={formattedDate}&localization=false";
 
-            var sd = await response.Content.ReadAsStringAsync();
-
+            var response = await _httpClient.GetAsync(requestUri, cancellationToken);
+            
             if (!response.IsSuccessStatusCode)
             {
+                _logger.LogError("Failed to get price from coingecko. Status Code: {StatusCode}, Request: {RequestUri}",
+                    response.StatusCode, requestUri);
                 return default;
             }
 
             response.EnsureSuccessStatusCode();
 
+            var data = await response.Content.ReadFromJsonAsync<CoingeckoCryptoCurrencyDataDto>(cancellationToken: cancellationToken);
 
-            var dtos = JsonConvert.DeserializeObject<CoingeckoCryptoCurrencyDataDto>(sd);
-            return dtos;
+            _logger.LogInformation("Successfully have get price from coingecko for keyword: {Keyword}, to {date}",
+                cryptoId, date);
+
+            return data;
         }
         catch (Exception e)
         {
-            //  _logger.LogError(e, "LAuto: Get details request error. Article - {Article}", article);
+            _logger.LogError(e, "An error occurred while getting price from coingecko.");
             return default;
         }
     }
