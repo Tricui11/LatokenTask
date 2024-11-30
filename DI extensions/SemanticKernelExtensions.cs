@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using LatokenTask.Services.Abstract;
+using LatokenTask.Services;
 
-namespace LatokenTask.Services
+namespace LatokenTask.Extensions
 {
     public static class SemanticKernelExtensions
     {
@@ -20,5 +21,4 @@ namespace LatokenTask.Services
             return services;
         }
     }
-
 }

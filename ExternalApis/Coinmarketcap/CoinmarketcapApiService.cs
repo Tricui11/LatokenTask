@@ -1,4 +1,5 @@
-﻿using LatokenTask.ExternalApis.Coinmarketcap;
+﻿using LatokenTask.ExternalApis;
+using LatokenTask.ExternalApis.Coinmarketcap;
 using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using MapsterMapper;

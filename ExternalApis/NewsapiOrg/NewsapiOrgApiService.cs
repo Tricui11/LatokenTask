@@ -1,4 +1,5 @@
-﻿using LatokenTask.ExternalApis.NewsapiOrg;
+﻿using LatokenTask.ExternalApis;
+using LatokenTask.ExternalApis.NewsapiOrg;
 using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using MapsterMapper;

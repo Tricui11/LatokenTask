@@ -34,47 +34,57 @@ namespace LatokenTask.Services
                 {
                     DateTime now = DateTime.UtcNow;
                     DateTime weekAgo = now.AddDays(-7);
+                    var data = await GetApisDataAsync(cryptoSymbols, weekAgo, now);
 
-                 //   var priceChange7d = await _pricesApiProvider.GetPricesChange7d(PriceApiServiceKeys.Coingecko, cryptoSymbols);
+                    var analysis = await _analysisService.AnalyzeAsync(cryptoSymbols, data.prices, data.news);
 
-                    var news = await GetNewsAsync(cryptoSymbols, weekAgo, now);
-
-                    //var analysis = await _analysisService.AnalyzeAsync(cryptoSymbols, priceChange7d, news);
-
-                    //await _botClient.SendTextMessageAsync(update.Message.Chat.Id, analysis);
+                    await _botClient.SendTextMessageAsync(update.Message.Chat.Id, analysis);
                 }
             }
+        }
+
+        private async Task<(List<NewsArticle> news, List<CryptoPriceInfo> prices)> GetApisDataAsync(string keyword,
+            DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+            List<NewsArticle> allNews = new();
+            List<CryptoPriceInfo> allPrices = new();
+
+            var newsApiServiceKeys = new List<NewsApiServiceKeys>((NewsApiServiceKeys[])Enum.GetValues(typeof(NewsApiServiceKeys)));
+            var pricesApiServiceKeys = new List<PriceApiServiceKeys>((PriceApiServiceKeys[])Enum.GetValues(typeof(PriceApiServiceKeys)));
+            var dataTasks = newsApiServiceKeys
+                .Select(x => Task.Run(() =>
+                GetApisNewsAsync(allNews, x, keyword, startDate, endDate, cancellationToken),
+                cancellationToken))
+                .Union(pricesApiServiceKeys
+                .Select(x => Task.Run(() =>
+                GetApisPricesAsync(allPrices, x, keyword, cancellationToken),
+                cancellationToken)))
+                .ToList();
+            
+            await Task.WhenAll(dataTasks);
+
+            return (allNews, allPrices);
+        }
+
+        private async Task GetApisNewsAsync(List<NewsArticle> allNews,
+            NewsApiServiceKeys serviceKey, string keyword, DateTime startDate, DateTime endDate,
+            CancellationToken cancellationToken = default)
+        {
+            var news = await   _newsApiProvider.GetNewsAsync(serviceKey, keyword, startDate, endDate, cancellationToken);
+            allNews.AddRange(news);
+        }
+
+        private async Task GetApisPricesAsync(List<CryptoPriceInfo> allPrices,
+            PriceApiServiceKeys serviceKey, string keyword, CancellationToken cancellationToken = default)
+        {
+            var prices = await _pricesApiProvider.GetPricesChange7d(serviceKey, keyword);
+            allPrices.AddRange(prices);
         }
 
         private Task HandleErrorAsync(Exception exception)
         {
             Console.WriteLine($"Error: {exception.Message}");
             return Task.CompletedTask;
-        }
-
-        private async Task<List<NewsArticle>> GetNewsAsync(string keyword, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
-        {
-
-            List<NewsArticle> allNews = new();
-
-
-            var sd = new List<NewsApiServiceKeys>((NewsApiServiceKeys[])Enum.GetValues(typeof(NewsApiServiceKeys)));
-
-            var searchTasks = sd
-                .Where(x => x == NewsApiServiceKeys.NewsapiOrg)
-    .Select(x => Task.Run(() =>
-            GetApiNewsAsync(allNews, x, keyword, startDate, endDate, cancellationToken),
-        cancellationToken))
-    .ToList();
-            await Task.WhenAll(searchTasks);
-
-            return allNews;
-        }
-
-        private async Task GetApiNewsAsync(List<NewsArticle> allNews, NewsApiServiceKeys serviceKey, string keyword, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
-        {
-            var news = await   _newsApiProvider.GetNewsAsync(serviceKey, keyword, startDate, endDate, cancellationToken);
-            allNews.AddRange(news);
         }
     }
 }

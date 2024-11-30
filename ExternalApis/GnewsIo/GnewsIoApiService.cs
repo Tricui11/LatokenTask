@@ -1,4 +1,5 @@
-﻿using LatokenTask.ExternalApis.GnewsIo;
+﻿using LatokenTask.ExternalApis;
+using LatokenTask.ExternalApis.GnewsIo;
 using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using MapsterMapper;

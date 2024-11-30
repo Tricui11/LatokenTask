@@ -5,6 +5,7 @@ using LatokenTask.ExternalApis.GnewsIo;
 using LatokenTask.ExternalApis.Cryptopanic;
 using LatokenTask.ExternalApis.Coinmarketcap;
 using LatokenTask.ExternalApis.Coingecko;
+using LatokenTask.Extensions;
 using LatokenTask.Mapping;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,4 +1,5 @@
-﻿using LatokenTask.ExternalApis.Cryptopanic;
+﻿using LatokenTask.ExternalApis;
+using LatokenTask.ExternalApis.Cryptopanic;
 using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using Microsoft.Extensions.Logging;

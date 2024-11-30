@@ -1,4 +1,4 @@
-﻿namespace LatokenTask.Services
+﻿namespace LatokenTask.ExternalApis
 {
     public static class HttpClientNames
     {

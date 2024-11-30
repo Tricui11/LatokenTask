@@ -1,20 +1,16 @@
 ﻿using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading;
 
 namespace LatokenTask.Services;
 
 public class PricesApiProvider : IPricesApiProvider
 {
     private readonly IServiceProvider _serviceProvider;
-   // private readonly ILogger<SupplierApiProvider> _logger;
 
     public PricesApiProvider(IServiceProvider serviceProvider)
-       // ILogger<SupplierApiProvider> logger)
     {
         _serviceProvider = serviceProvider;
-       // _logger = logger;
     }
 
     public async Task<List<CryptoPriceInfo>> GetPricesChange7d(PriceApiServiceKeys serviceKey,
@@ -28,12 +24,9 @@ public class PricesApiProvider : IPricesApiProvider
 
             return Prices;
         }
-        catch (Exception ex)
+        catch
         {
-            //_logger.LogError(ex, "Ошибка при получении данных от поставщика: {SupplierService}",
-            //    apiService.GetType().Name);
-
-            return default;
+            return new List<CryptoPriceInfo>();
         }
     }
 

@@ -27,11 +27,12 @@ namespace LatokenTask.Services
 
             chatMessages.AddUserMessage(aggregatedNews);
 
+            chatMessages.AddUserMessage($"Пожалуйста, учтите только эти новости и данные, " +
+                $"чтобы сформировать выводы о текущем изменении {cryptoSymbol}. Старые данные не должны использоваться.");
+
             var response = await _kernelService.GetResponseFromChatAsync(chatMessages);
 
             return response;
         }
-
     }
-
 }

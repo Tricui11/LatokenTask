@@ -1,4 +1,5 @@
-﻿using LatokenTask.Models;
+﻿using LatokenTask.Extensions;
+using LatokenTask.Models;
 using LatokenTask.Services;
 using LatokenTask.Services.Abstract;
 using Microsoft.Extensions.DependencyInjection;

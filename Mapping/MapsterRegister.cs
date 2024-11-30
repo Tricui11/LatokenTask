@@ -4,16 +4,16 @@ using LatokenTask.ExternalApis.NewsapiOrg;
 using LatokenTask.Models;
 using Mapster;
 
-namespace LatokenTask.ExternalApis
+namespace LatokenTask.Mapping
 {
     public partial class MapsterRegister : IRegister
     {
         public void Register(TypeAdapterConfig config)
         {
-            config.NewConfig<NewsapiOrgArticleDto, NewsArticle>()
+            config.NewConfig<NewsapiOrgArticle, NewsArticle>()
                 .Map(d => d.Source, s => "newsapi.org");
 
-            config.NewConfig<GnewsIoArticleDto, NewsArticle>()
+            config.NewConfig<GnewsIoArticle, NewsArticle>()
                 .Map(d => d.Source, s => "gnews.io");
 
             config.NewConfig<CoinmarketcapCryptoData, CryptoPriceInfo>()

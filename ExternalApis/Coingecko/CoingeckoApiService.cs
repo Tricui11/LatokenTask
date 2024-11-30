@@ -1,4 +1,5 @@
-﻿using LatokenTask.ExternalApis.Coingecko;
+﻿using LatokenTask.ExternalApis;
+using LatokenTask.ExternalApis.Coingecko;
 using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using Microsoft.Extensions.Logging;
