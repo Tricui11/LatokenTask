@@ -2,6 +2,7 @@
 {
     public enum PriceApiServiceKeys
     {
-        Coinmarketcap
+        Coinmarketcap,
+        Coingecko
     }
 }

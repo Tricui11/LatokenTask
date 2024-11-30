@@ -35,13 +35,13 @@ namespace LatokenTask.Services
                     DateTime now = DateTime.UtcNow;
                     DateTime weekAgo = now.AddDays(-7);
 
-                    var priceChange7d = await _pricesApiProvider.GetPricesChange7d(PriceApiServiceKeys.Coinmarketcap, cryptoSymbols);
+                    var priceChange7d = await _pricesApiProvider.GetPricesChange7d(PriceApiServiceKeys.Coingecko, cryptoSymbols);
 
-                    var news = await GetNewsAsync(cryptoSymbols, weekAgo, now);
+                    //var news = await GetNewsAsync(cryptoSymbols, weekAgo, now);
 
-                    var analysis = await _analysisService.AnalyzeAsync(cryptoSymbols, priceChange7d, news);
+                    //var analysis = await _analysisService.AnalyzeAsync(cryptoSymbols, priceChange7d, news);
 
-                    await _botClient.SendTextMessageAsync(update.Message.Chat.Id, analysis);
+                    //await _botClient.SendTextMessageAsync(update.Message.Chat.Id, analysis);
                 }
             }
         }

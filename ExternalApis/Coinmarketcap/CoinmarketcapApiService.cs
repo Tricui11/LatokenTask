@@ -49,6 +49,7 @@ public class CoinmarketcapApiService : IPricesService
                 Symbol = c.Symbol,
                 Price = c.Quote.USD.Price,
                 PercentChange7d = c.Quote.USD.PercentChange7d,
+                Source = "Coinmarketcap"
             }).ToList();
 
             return res;

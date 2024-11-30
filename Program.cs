@@ -7,6 +7,7 @@ using LatokenTask.ExternalApis.NewsapiOrg;
 using LatokenTask.ExternalApis.GnewsIo;
 using LatokenTask.ExternalApis.Cryptopanic;
 using LatokenTask.ExternalApis.Coinmarketcap;
+using LatokenTask.ExternalApis.Coingecko;
 
 var builder = Host.CreateDefaultBuilder(args);
 
@@ -32,6 +33,7 @@ builder.ConfigureServices((context, services) =>
 
     services
     .AddScoped<IPricesApiProvider, PricesApiProvider>()
+    .AddCoingeckoApiSupport()
     .AddCoinmarketcapApiSupport();
 
 

@@ -6,5 +6,6 @@
         public const string GnewsIo = nameof(GnewsIo);
         public const string Coinmarketcap = nameof(Coinmarketcap);
         public const string Cryptopanic = nameof(Cryptopanic);
+        public const string Coingecko = nameof(Coingecko);
     }
 }
