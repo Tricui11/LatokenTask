@@ -3,7 +3,6 @@ using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
-using System.Net;
 using System.Net.Http.Json;
 
 namespace LatokenTask.Services;
@@ -31,36 +30,42 @@ public class GnewsIoApiService : INewsService
     {
         try
         {
-            var response = await _httpClient
-                .GetAsync($"search?q={keyword}&lang=en&country=us&apikey={_options.ApiKey}",
-                    cancellationToken);
+            _logger.LogInformation("Start fetching news from gnews.io for keyword: {Keyword}, from {StartDate} to {EndDate}",
+                keyword, startDate, endDate);
 
-            var sd = await response.Content.ReadAsStringAsync();    
+            var requestUri = $"search?q={keyword}&lang=en&country=us&apikey={_options.ApiKey}";
+
+            var response = await _httpClient.GetAsync(requestUri, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
+                _logger.LogError("Failed to fetch news from gnews.io. Status Code: {StatusCode}, Request: {RequestUri}",
+                    response.StatusCode, requestUri);
+                return new List<NewsArticle>();
+            }
+            
+            response.EnsureSuccessStatusCode();
+            
+            var data = await response.Content.ReadFromJsonAsync<GnewsIoNewsResponseDto>(cancellationToken: cancellationToken);
+
+            if (data?.Articles == null || data.Articles.Count == 0)
+            {
+                _logger.LogWarning("No articles found for the given query: {Keyword}, from {StartDate} to {EndDate}",
+                    keyword, startDate, endDate);
                 return new List<NewsArticle>();
             }
 
-            response.EnsureSuccessStatusCode();
-           var data = await response.Content.ReadFromJsonAsync<GnewsIoNewsResponseDto>(cancellationToken: cancellationToken);
-
-
             var news = _mapper.Map<List<NewsArticle>>(data.Articles);
 
+            _logger.LogInformation("Successfully fetched {ArticleCount} articles from gnews.io.", news.Count);
 
             return news;
         }
         catch (Exception e)
         {
-          //  _logger.LogError(e, "LAuto: Get details request error. Article - {Article}", article);
+            _logger.LogError(e, "An error occurred while fetching news from gnews.io.");
+
             return new List<NewsArticle>();
         }
-
-
-
-
-
-
     }
 }

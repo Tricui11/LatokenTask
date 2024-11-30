@@ -16,7 +16,6 @@ public static class Extensions
         services.AddHttpClient(HttpClientNames.GnewsIo,
             x =>
             {
-             //   x.DefaultRequestHeaders.UserAgent.ParseAdd("LatokenTask.API");
                 x.BaseAddress = new Uri(options.BaseUrl);
             });
 
