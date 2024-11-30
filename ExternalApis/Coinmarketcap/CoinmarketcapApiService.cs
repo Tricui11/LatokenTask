@@ -4,7 +4,7 @@ using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
-using System.Net.Http.Json;
+using Newtonsoft.Json;
 
 namespace LatokenTask.Services;
 
@@ -43,7 +43,9 @@ public class CoinmarketcapApiService : IPricesService
 
             response.EnsureSuccessStatusCode();
 
-            var responseDto = await response.Content.ReadFromJsonAsync<CoinMarketCapResponseDto>(cancellationToken: cancellationToken);
+            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
+
+            var responseDto = JsonConvert.DeserializeObject<CoinMarketCapResponseDto>(responseContent);
 
             if (responseDto?.Data == null || responseDto.Data.Count == 0)
             {

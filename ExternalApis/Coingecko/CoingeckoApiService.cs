@@ -3,6 +3,7 @@ using LatokenTask.ExternalApis.Coingecko;
 using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System.Globalization;
 using System.Net.Http.Json;
 
@@ -54,14 +55,14 @@ public class CoingeckoApiService : IPricesService
             {
                 await Task.Delay(250, cancellationToken);
                 var currentPriceData = await GetCoinPriceInfoToDate(searchCryptoSymbol, today);
-                if (currentPriceData == null)
+                if (currentPriceData?.MarketData?.CurrentPrice == null)
                 {
                     continue;
                 }
 
                 await Task.Delay(250, cancellationToken);
                 var sevenDaysAgoPriceData = await GetCoinPriceInfoToDate(searchCryptoSymbol, sevenDaysAgo);
-                if (sevenDaysAgoPriceData == null)
+                if (sevenDaysAgoPriceData?.MarketData?.CurrentPrice == null)
                 {
                     continue;
                 }
@@ -146,10 +147,10 @@ public class CoingeckoApiService : IPricesService
 
             string formattedDate = date.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
 
-            var requestUri = $"{cryptoId}/history?date={formattedDate}&localization=false";
+            var requestUri = $"coins/{cryptoId}/history?date={formattedDate}&localization=false";
 
             var response = await _httpClient.GetAsync(requestUri, cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError("Failed to get price from coingecko. Status Code: {StatusCode}, Request: {RequestUri}",
@@ -159,7 +160,9 @@ public class CoingeckoApiService : IPricesService
 
             response.EnsureSuccessStatusCode();
 
-            var data = await response.Content.ReadFromJsonAsync<CoingeckoCryptoCurrencyDataDto>(cancellationToken: cancellationToken);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            var data = JsonConvert.DeserializeObject<CoingeckoCryptoCurrencyDataDto>(responseContent);
 
             _logger.LogInformation("Successfully have get price from coingecko for keyword: {Keyword}, to {date}",
                 cryptoId, date);

@@ -18,7 +18,7 @@ namespace LatokenTask.Services
             var chatMessages = new ChatHistory();
 
             string priceList = string.Join("\n", prices.Select(p =>
-                $"Название: {p.Name}, Цена: {p.Price:C}, Изменение за 7 дней: {p.PercentChange7d}%"));
+                $"Криптовалюта: {p.Symbol}, Полное название: {p.Name}, Цена: {p.Price:C2}, Изменение за 7 дней: {p.PercentChange7d:F2}%"));
 
             chatMessages.AddUserMessage($"Символ: {cryptoSymbol}\nДоступные варианты:\n{priceList}");
 
@@ -27,8 +27,14 @@ namespace LatokenTask.Services
 
             chatMessages.AddUserMessage(aggregatedNews);
 
-            chatMessages.AddUserMessage($"Пожалуйста, учтите только эти новости и данные, " +
-                $"чтобы сформировать выводы о текущем изменении {cryptoSymbol}. Старые данные не должны использоваться.");
+            chatMessages.AddUserMessage($"Насколько изменилась цена {cryptoSymbol} за 7 дней? " +
+                $"Объясни почему цена снизилась или увеличилась на основании предоставленных цен и новостей.");
+
+            chatMessages.AddUserMessage($"Важно: Пожалуйста, учтите только эти новости, чтобы объяснить, " +
+                $"почему произошли изменения в цене {cryptoSymbol}. " +
+                "Не используйте старые данные или источники за пределами предоставленных новостей. " +
+                "Вам нужно сформировать выводы только на основе " +
+                "текущих новостей и информации о ценах, которые я вам предоставил.");
 
             var response = await _kernelService.GetResponseFromChatAsync(chatMessages);
 
