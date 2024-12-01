@@ -83,8 +83,8 @@ namespace LatokenTask.Services
             {
                 _logger.LogInformation("Fetching news and price data from APIs...");
                 
-                var newsApiServiceKeys = new List<NewsApiServiceKeys>((NewsApiServiceKeys[])Enum.GetValues(typeof(NewsApiServiceKeys)));
-                var pricesApiServiceKeys = new List<PriceApiServiceKeys>((PriceApiServiceKeys[])Enum.GetValues(typeof(PriceApiServiceKeys)));
+                var newsApiServiceKeys = (NewsApiServiceKeys[])Enum.GetValues(typeof(NewsApiServiceKeys));
+                var pricesApiServiceKeys = (PriceApiServiceKeys[])Enum.GetValues(typeof(PriceApiServiceKeys));
                 var dataTasks = newsApiServiceKeys
                     .Select(x => Task.Run(() =>
                     GetApisNewsAsync(allNews, x, keyword, startDate, endDate, cancellationToken),
