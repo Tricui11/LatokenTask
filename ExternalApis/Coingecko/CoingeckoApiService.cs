@@ -87,7 +87,7 @@ public class CoingeckoApiService : IPricesService
         catch (Exception e)
         {
             _logger.LogError(e, "An error occurred while getting price from coingecko.");
-            return default;
+            return new List<CryptoPriceInfo>();
         }
     }
 
