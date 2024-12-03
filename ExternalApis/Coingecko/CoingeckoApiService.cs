@@ -34,7 +34,7 @@ public class CoingeckoApiService : IPricesService
 
             string[] cryptoSubstrings = cryptoSymbols.Split(',').Select(s => s.Trim()).ToArray();
 
-            List<string> searchCryptoSymbols = new();
+            List<string> coinIds = new();
             foreach (var coin in coins)
             {
                 foreach (var cryptoSubstring in cryptoSubstrings)
@@ -43,7 +43,7 @@ public class CoingeckoApiService : IPricesService
                         string.Equals(coin.Name, cryptoSubstring, StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(coin.Symbol, cryptoSubstring, StringComparison.OrdinalIgnoreCase))
                     {
-                        searchCryptoSymbols.Add(coin.Id);
+                        coinIds.Add(coin.Id);
                     }
                 }
             }
@@ -51,17 +51,17 @@ public class CoingeckoApiService : IPricesService
             List<CryptoPriceInfo> res = new();
             var today = DateTime.Today;
             var sevenDaysAgo = DateTime.Today.AddDays(-7);
-            foreach (var searchCryptoSymbol in searchCryptoSymbols.Distinct())
+            foreach (var coinId in coinIds.Distinct())
             {
                 await Task.Delay(250, cancellationToken);
-                var currentPriceData = await GetCoinPriceInfoToDate(searchCryptoSymbol, today);
+                var currentPriceData = await GetCoinPriceInfoToDate(coinId, today);
                 if (currentPriceData?.MarketData?.CurrentPrice == null)
                 {
                     continue;
                 }
 
                 await Task.Delay(250, cancellationToken);
-                var sevenDaysAgoPriceData = await GetCoinPriceInfoToDate(searchCryptoSymbol, sevenDaysAgo);
+                var sevenDaysAgoPriceData = await GetCoinPriceInfoToDate(coinId, sevenDaysAgo);
                 if (sevenDaysAgoPriceData?.MarketData?.CurrentPrice == null)
                 {
                     continue;
