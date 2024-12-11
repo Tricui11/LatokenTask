@@ -14,7 +14,8 @@ namespace LatokenTask.Services
             _kernelService = kernelService;
         }
 
-        public async Task<string> AnalyzeAsync(string cryptoSymbol, List<CryptoPriceInfo> prices, List<NewsArticle> newsArticles)
+        public async Task<string> AnalyzeAsync(string cryptoSymbol,
+            IEnumerable<CryptoPriceInfo> prices, IEnumerable<NewsArticle> newsArticles)
         {
             var chatMessages = new ChatHistory();
 

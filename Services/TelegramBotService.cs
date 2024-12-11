@@ -1,6 +1,7 @@
 ﻿using LatokenTask.Models;
 using LatokenTask.Services.Abstract;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using Telegram.Bot.Types;
 
 namespace LatokenTask.Services
@@ -73,11 +74,11 @@ namespace LatokenTask.Services
             }
         }
 
-        private async Task<(List<NewsArticle> news, List<CryptoPriceInfo> prices)> GetApisDataAsync(string keyword,
-            DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        private async Task<(ConcurrentBag<NewsArticle> news, ConcurrentBag<CryptoPriceInfo> prices)> GetApisDataAsync(
+            string keyword, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
         {
-            List<NewsArticle> allNews = new();
-            List<CryptoPriceInfo> allPrices = new();
+            ConcurrentBag<NewsArticle> allNews = new();
+            ConcurrentBag<CryptoPriceInfo> allPrices = new();
             
             try
             {
@@ -107,15 +108,20 @@ namespace LatokenTask.Services
             return (allNews, allPrices);
         }
 
-        private async Task GetApisNewsAsync(List<NewsArticle> allNews,
+        private async Task GetApisNewsAsync(ConcurrentBag<NewsArticle> allNews,
             NewsApiServiceKeys serviceKey, string keyword, DateTime startDate, DateTime endDate,
             CancellationToken cancellationToken = default)
         {
             try
             {
                 _logger.LogInformation("Fetching news for service {ServiceKey}...", serviceKey);
+
                 var news = await _newsApiProvider.GetNewsAsync(serviceKey, keyword, startDate, endDate, cancellationToken);
-                allNews.AddRange(news);
+                foreach (var item in news)
+                {
+                    allNews.Add(item);
+                }
+
                 _logger.LogInformation("Fetched {NewsCount} news articles.", news.Count);
             }
             catch (Exception ex)
@@ -124,14 +130,19 @@ namespace LatokenTask.Services
             }
         }
 
-        private async Task GetApisPricesAsync(List<CryptoPriceInfo> allPrices,
+        private async Task GetApisPricesAsync(ConcurrentBag<CryptoPriceInfo> allPrices,
             PriceApiServiceKeys serviceKey, string keyword, CancellationToken cancellationToken = default)
         {
             try
             {
                 _logger.LogInformation("Fetching prices for service {ServiceKey}...", serviceKey);
+
                 var prices = await _pricesApiProvider.GetPricesChange7d(serviceKey, keyword);
-                allPrices.AddRange(prices);
+                foreach (var price in prices)
+                {
+                    allPrices.Add(price);
+                }
+
                 _logger.LogInformation("Fetched {PriceCount} price records.", prices.Count);
             }
             catch (Exception ex)
