@@ -61,16 +61,3 @@ NewsAPI: For fetching news articles related to cryptocurrencies.
 CoinMarketCap, CoinGecko, and others: For providing cryptocurrency market data.
 License
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-Contact
-For any questions or contributions, feel free to open an issue or contact the maintainer at [your email address].
-
-markdown
-
-### Key Formatting Breakdown:
-- **Bold Text**: For section titles like **Problem Statement**, **Features**, **Technologies Used**, etc.
-- **Code Block**: For commands like cloning the repository, installing dependencies, and running the app, enclosed in triple backticks (\`\`\`).
-- **Links**: For the Telegram bot and Discord community.
-- **Headings**: Used to structure the document (e.g., `#` for main headings, `##` for subheadings).
-
-This structure will look clean and formatted properly when viewed on GitHub.
